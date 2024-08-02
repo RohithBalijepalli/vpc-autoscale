@@ -1,0 +1,32 @@
+---
+- name: Install and Configure Nginx on EC2 instances
+  hosts: web
+  become: true
+  tasks:
+    - name: Install Nginx
+      dnf:
+        name: nginx
+        state: present
+
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Create a custom index.html
+      copy:
+        content: |
+          <html>
+          <head>
+            <title>Hello, World!</title>
+          </head>
+          <body>
+            <h1>Hello, World!</h1>
+            <p>This is a custom Nginx page.</p>
+          </body>
+          </html>
+        dest: /usr/share/nginx/html/index.html
+        owner: nginx
+        group: nginx
+        mode: '0644'
