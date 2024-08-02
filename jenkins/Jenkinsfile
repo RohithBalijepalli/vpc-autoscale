@@ -1,0 +1,99 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        SSH_PRIVATE_KEY       = credentials('ssh-private-key') // Can be configured in the jenkins credentials and referenced here
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                script {
+                    checkout scm
+                }
+            }
+        }
+
+        stage('Terraform Init and Plan') {
+            steps {
+                script {
+                    sh 'terraform init'
+                    sh 'terraform plan -out=tfplan'
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                script {
+                    sh 'terraform apply -auto-approve tfplan'
+                }
+            }
+        }
+
+        stage('Ansible Setup') {
+            steps {
+                script {
+                    sh 'mkdir -p ~/.ssh'
+                    writeFile file: '~/.ssh/id_rsa', text: env.SSH_PRIVATE_KEY
+                    sh 'chmod 600 ~/.ssh/id_rsa'
+                    sh 'ssh-keyscan -H <instance_public_ip> >> ~/.ssh/known_hosts'
+                }
+            }
+        }
+
+        stage('Run Ansible Playbook') {
+            steps {
+                script {
+                    sh 'ansible-playbook -i ansible/inventory ansible/playbook.yml'
+                }
+            }
+        }
+
+        stage('Puppet Setup') {
+            steps {
+                script {
+                    sh 'scp -i ~/.ssh/id_rsa puppet/manifests/apache.pp ec2-user@<instance_public_ip>:/home/ec2-user/'
+                }
+            }
+        }
+
+        stage('Run Puppet') {
+            steps {
+                script {
+                    sh 'ssh -i ~/.ssh/id_rsa ec2-user@<instance_public_ip> sudo /opt/puppetlabs/bin/puppet apply /home/ec2-user/apache.pp'
+                }
+            }
+        }
+
+        stage('Post-Deployment Verification') {
+            steps {
+                script {
+                    sh 'curl http://<load_balancer_dns_name>'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment succeeded!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+        always {
+            script {
+                sh 'terraform destroy -auto-approve'
+            }
+            cleanWs() // Clean up the workspace
+        }
+    }
+}
