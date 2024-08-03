@@ -1,4 +1,4 @@
-## VPC-Autoscale
+## VPC-Autoscale - Secure VPC Architecture with Auto Scaling, NAT Gateways and Subnets
 
 ### Project Overview
 
