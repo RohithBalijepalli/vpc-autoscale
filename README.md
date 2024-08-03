@@ -78,7 +78,7 @@ Below's the architecture:
 
 ### Why I Did This
 
-I've always been fascinated by the cloud and its endless possibilities. This project gave me the perfect excuse to dive deep into AWS and learn how to automate and manage resources like a pro. Plus, who doesn't love seeing their infrastructure scale effortlessly in response to demand?
+I've always been fascinated by the cloud and its endless possibilities. This project gave me the perfect excuse to dive deep into AWS and learn how to automate and manage resources using multiple technologies. Plus, who doesn't love seeing their infrastructure scale effortlessly in response to demand?
 
 ### Why I believe it's a great project
 
