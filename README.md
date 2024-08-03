@@ -2,7 +2,7 @@
 
 ### Project Overview
 
-Hey there! Welcome to my wild adventure into the world of AWS, where I've been having a blast exploring cloud resources and playing around with infrastructure automation. Getting my hands dirty with Terraform, Ansible, Puppet, and Jenkins, I’ve conjured up a system that scales AWS resources up or down based on load. Expecto Patronum - poof, more servers!
+This project involves creating a secure Virtual Private Cloud (VPC) with both public and private subnets, NAT gateways, and auto-scaling capabilities. Using Terraform for infrastructure as code, Ansible and Puppet for configuration management, and Jenkins for continuous integration and deployment, I’ve built a resilient and scalable cloud infrastructure. The setup ensures high availability and security, with automated scaling to handle varying loads efficiently!
 
 ### Prerequisites
 
